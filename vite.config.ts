@@ -18,7 +18,7 @@ export default defineConfig({
         presetUno(),
         // ...custom presets
       ],
-      // 自定义guiz
+      // 自定义规则
       rules:  [],
     })
   ],

@@ -11,6 +11,8 @@ import zhCn from 'element-plus/dist/locale/zh-cn.mjs'
 import * as ElementPlusIconsVue from '@element-plus/icons-vue'
 // 清除原生样式
 import '@/assets/css/reset.css'
+// 引入UnoCSS
+import 'uno.css'
 
 const app = createApp(App)
 

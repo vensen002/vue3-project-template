@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="w-full h-full flex items-center justify-center">
     页脚
   </div>
 </template>

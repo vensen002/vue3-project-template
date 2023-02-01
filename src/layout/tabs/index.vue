@@ -1,6 +1,6 @@
 <template>
   <div>
-    侧边栏
+    面包屑
   </div>
 </template>
 

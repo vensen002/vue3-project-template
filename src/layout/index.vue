@@ -3,10 +3,10 @@
   <el-container class="h-full">
     <el-aside width="auto"> <Menu /> </el-aside>
     <el-container>
-    <el-header class="el-header" height="50px"> <Header/> </el-header>
+    <el-header class="el-header" height="54px"> <Header/> </el-header>
       <Tabs/>
       <el-main>content</el-main>
-      <el-footer class="el-footer"><Footer/></el-footer>
+      <el-footer class="el-footer" height="54px"><Footer/></el-footer>
     </el-container>
   </el-container>
 </div>
@@ -37,6 +37,6 @@ const systemStore = useSystemStore();
   }
 }
 :deep(ul.el-menu){
-  border-right-width: 0px
+  border-right-width: 0
 }
 </style>

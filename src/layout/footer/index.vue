@@ -1,6 +1,6 @@
 <template>
   <div class="w-full h-full flex items-center justify-center">
-    页脚
+    Copyright © 2012-2022&nbsp;<a href="http://www.java1234.vip" target="_blank">java1234</a>
   </div>
 </template>
 

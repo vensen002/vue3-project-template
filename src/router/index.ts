@@ -9,6 +9,10 @@ const router = createRouter({
       name: '首页',
       component: Layout,
       children: []
+    },{
+      path: '/login',
+      name: 'Login',
+      component: () => import('@/views/login/index.vue')
     }
   ]
 })

@@ -18,8 +18,6 @@ import Tabs from './tabs/index.vue'
 import Menu from './menu/index.vue'
 import Footer from  './footer/index.vue'
 
-import { useSystemStore } from "@/stores/system";
-const systemStore = useSystemStore();
 
 </script>
 

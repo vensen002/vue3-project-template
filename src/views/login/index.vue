@@ -71,7 +71,21 @@ const loginForm = reactive<LoginForm>({
   rememberMe: true,
 })
 
-
+const submitForm = (formEl: FormInstance | undefined) => {
+  if (!formEl) return
+  formEl.validate( async (valid) => {
+    if (valid) {
+      // 是否记住密码
+      loginForm.rememberMe ? setCookies() : removeCookies();
+      let data = await useLoginApi().login(loginForm);
+      console.log(data)
+      console.log('submit!')
+    } else {
+      console.log('error submit!')
+      return false
+    }
+  })
+}
 
 // 登录账号
 const onVerifyAccount = (rule: any, value: string, callback: any) => {
@@ -115,35 +129,17 @@ const removeCookies = () => {
 }
 // 获取Cookie用户信息
 const getCookies = () => {
-  const username = Cookie.get("username");
-  const password = <string>decrypt(Cookie.get("password"));
-  const rememberMe = <boolean>Cookie.get("rememberMe");
-  console.log(username, password, rememberMe)
-  loginForm.username = username === undefined ? loginForm.username : username;
-  loginForm.password = password;
-  loginForm.rememberMe = rememberMe;
+  const username: string | boolean = Cookie.get("username");
+  const password: string | boolean = decrypt(Cookie.get("password"));
+  const rememberMe: string | boolean = Cookie.get("rememberMe");
+  loginForm.username = username ? username as string : loginForm.username;
+  loginForm.password = password ? password as string : loginForm.password;
+  loginForm.rememberMe = rememberMe === 'true';
 }
 
 getCookies()
 
-const submitForm = (formEl: FormInstance | undefined) => {
-  if (!formEl) return
-  formEl.validate( async (valid) => {
-    if (valid) {
-      if (loginForm.rememberMe) {
-        setCookies();
-      } else {
-        removeCookies();
-      }
-      let data = await useLoginApi().login(loginForm);
-      console.log(data)
-      console.log('submit!')
-    } else {
-      console.log('error submit!')
-      return false
-    }
-  })
-}
+
 </script>
 
 <style scoped lang="less">

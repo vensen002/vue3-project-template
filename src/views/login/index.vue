@@ -50,20 +50,21 @@
 
 <script setup lang="ts">
 import {ref, reactive} from "vue"
-import type { FormRules, FormInstance } from 'element-plus'
-import { verifyCnAndSpace, verifyAccount, verifyPassword } from '@/utils/toolsValidate'
+import type {FormRules, FormInstance} from 'element-plus'
+import {verifyCnAndSpace, verifyAccount, verifyPassword} from '@/utils/toolsValidate'
 import Cookie from 'js-cookie'
-import { encrypt, decrypt } from "@/utils/jsencrypt";
+import {encrypt, decrypt} from "@/utils/jsencrypt";
+import {useLoginApi} from '@/api/login'
+import type {LoginForm} from '@/api/login'
+import {useUserStore} from "@/stores/user";
+import type {UserInfo, MenuInfo} from "@/interface/userInfo";
+import {ElMessage} from "element-plus";
+import router from "@/router";
+import {Session} from "@/utils/storage";
 
-import { useLoginApi } from '@/api/login'
 
+const userStore = useUserStore();
 const loginFormRef = ref<FormInstance>();
-
-interface LoginForm {
-  username: string
-  password: string
-  rememberMe: boolean
-}
 
 const loginForm = reactive<LoginForm>({
   username: '',
@@ -71,23 +72,42 @@ const loginForm = reactive<LoginForm>({
   rememberMe: true,
 })
 
+// 表单提交
 const submitForm = (formEl: FormInstance | undefined) => {
   if (!formEl) return
-  formEl.validate( async (valid) => {
+  formEl.validate(async (valid) => {
     if (valid) {
       // 是否记住密码
       loginForm.rememberMe ? setCookies() : removeCookies();
       let data = await useLoginApi().login(loginForm);
-      console.log(data)
-      console.log('submit!')
+      if (data.code == 200) {
+        userStore.token = <string>data.authorization
+        userStore.userInfo = data.currentUser as UserInfo
+        userStore.menuList = data.menuList as MenuInfo[]
+        Session.set('token', userStore.token)
+        ElMessage({
+          message: data.msg,
+          type: 'success',
+        })
+        await router.replace("/")
+      } else {
+        ElMessage.error(data.msg)
+      }
     } else {
-      console.log('error submit!')
+      console.log('验证失败!')
       return false
     }
   })
 }
 
-// 登录账号
+// form 校验
+const loginRules = reactive<FormRules>({
+  username: [{required: true, message: '请输入账号', trigger: 'blur'}],
+  password: [{required: true, message: '请输入密码', trigger: 'blur'}]
+  // username: [{ validator: onVerifyAccount, trigger: ['blur','change'] }],
+  // password: [{ validator: onVerifyPassword, trigger: ['blur','change'] }]
+});
+// 登录账号 校验
 const onVerifyAccount = (rule: any, value: string, callback: any) => {
   if (value === '') {
     callback(new Error('请输入用户名'))
@@ -99,7 +119,7 @@ const onVerifyAccount = (rule: any, value: string, callback: any) => {
     callback()
   }
 }
-// 密码
+// 密码 校验
 const onVerifyPassword = (rule: any, value: string, callback: any) => {
   if (value === '') {
     callback(new Error('请输入密码'))
@@ -111,23 +131,20 @@ const onVerifyPassword = (rule: any, value: string, callback: any) => {
     callback()
   }
 };
-// form 校验
-const loginRules = reactive<FormRules>({
-  username: [{ validator: onVerifyAccount, trigger: ['blur','change'] }],
-  // password: [{ validator: onVerifyPassword, trigger: ['blur','change'] }]
-});
 
+// 记住账号密码
 const setCookies = () => {
-  Cookie.set('username', loginForm.username, { expires: 30 })
-  Cookie.set('password', encrypt(loginForm.password), { expires: 30 })
-  Cookie.set('rememberMe', loginForm.rememberMe, { expires: 30 })
+  Cookie.set('username', loginForm.username, {expires: 30})
+  Cookie.set('password', encrypt(loginForm.password), {expires: 30})
+  Cookie.set('rememberMe', loginForm.rememberMe, {expires: 30})
 }
+// 移除账号密码
 const removeCookies = () => {
   Cookie.remove('username')
   Cookie.remove('password')
   Cookie.remove('rememberMe')
 }
-// 获取Cookie用户信息
+// 获取Cookie 中的账号密码
 const getCookies = () => {
   const username: string | boolean = Cookie.get("username");
   const password: string | boolean = decrypt(Cookie.get("password"));
@@ -136,9 +153,8 @@ const getCookies = () => {
   loginForm.password = password ? password as string : loginForm.password;
   loginForm.rememberMe = rememberMe === 'true';
 }
-
+// 加载时运行一次
 getCookies()
-
 
 </script>
 

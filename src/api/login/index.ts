@@ -1,6 +1,18 @@
 import request from "@/utils/request";
-import * as qs from "qs";
+import type { Result } from "@/api/requestType";
+import type { MenuInfo, UserInfo } from "@/interface/userInfo"
 
+interface LoginResult extends Result {
+    menuList?: MenuInfo[];
+    authorization?: string;
+    currentUser?: UserInfo;
+}
+
+export interface LoginForm {
+    username: string;
+    password: string;
+    rememberMe: boolean;
+}
 /**
  * （不建议写成 request.post(xxx)，因为这样 post 时，无法 params 与 data 同时传参）
  *
@@ -10,11 +22,11 @@ import * as qs from "qs";
  */
 export function useLoginApi() {
     return {
-        login: (data: object) => {
+        login: (params: LoginForm): Promise<LoginResult> => {
             return request({
-                url: 'login?' + qs.stringify(data),
+                url: 'login',
                 method: 'post',
-                data,
+                params: params,
             });
         },
         signOut: (data: object) => {

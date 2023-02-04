@@ -1,5 +1,5 @@
 import axios from "axios";
-import type { AxiosInstance, AxiosResponse, InternalAxiosRequestConfig } from 'axios'
+import type { AxiosInstance, InternalAxiosRequestConfig } from 'axios'
 import { ElMessage, ElMessageBox } from 'element-plus';
 import { Session } from '@/utils/storage';
 import qs from 'qs';
@@ -32,7 +32,7 @@ service.interceptors.request.use((config: InternalAxiosRequestConfig) => {
 );
 
 // 添加响应拦截器
-service.interceptors.response.use((response: AxiosResponse) => {
+service.interceptors.response.use((response) => {
         // 对响应数据做点什么
         const res = response.data;
         if (res.code && res.code !== 0) {
